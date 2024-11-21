@@ -13,18 +13,38 @@ namespace KnifeShop.DB.Repositories
             _context = context;
         }
 
-        public async Task Create(string title, string? description, string? image, string price, bool isOnSale)
+        public async Task Create(string title, string category, string? description, string? image, double price, bool isOnSale)
         {
-            var knife = new Knife(title, description, image, price, isOnSale);
+            var knife = new Knife(title, category, description, image, price, isOnSale);
 
             await _context.Knifes.AddAsync(knife);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<Knife?> Edit(long id, string title, string category, string description, string image, double price, bool isOnSale)
+        {
+            var knife = await _context.Knifes.FirstOrDefaultAsync(x => x.Id == id);
+
+            if(knife is not null)
+            {
+                knife.Title = title;
+                knife.Category = category;
+                knife.Description = description;
+                knife.Image = image;
+                knife.Price = price;
+                knife.IsOnSale = isOnSale;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return knife;
+        }
+
         public async Task<List<Knife>> Get(string? search, string? sortItem, string? order)
         {
             var notesQuery = _context.Knifes
             .Where(n => string.IsNullOrWhiteSpace(search) ||
-                        n.Title.ToLower().Contains(search.ToLower()));
+                        n.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
 
             Expression<Func<Knife, object>> selectorKey = sortItem?.ToLower() switch
             {

@@ -2,21 +2,23 @@
 {
     public class Knife
     {
-        public Knife(string title, string? description, string? image, string price, bool isOnSale)
+        public Knife(string title, string category, string? description, string? image, double price, bool isOnSale, DateTime? createdAt = null)
         {
             Title = title;
+            Category = category;
             Description = description;
             Image = image;
             Price = price;
             IsOnSale = isOnSale;
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = createdAt ?? DateTime.Now;
         }
 
-        public Guid Id { get; set; }
+        public long Id { get; set; }
         public string Title { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string? Image { get; set; }
-        public string Price { get; set; } = string.Empty;
+        public double Price { get; set; }
         public bool IsOnSale { get; set; }
         public DateTime CreatedAt { get; set; }
     }

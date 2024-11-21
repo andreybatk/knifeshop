@@ -1,10 +1,7 @@
-using KnifeShop.API.Models;
+using KnifeShop.API.DiContainer;
 using KnifeShop.DB;
 using KnifeShop.DB.DiContainer;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace KnifeShop.API
 {
@@ -14,29 +11,16 @@ namespace KnifeShop.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            AuthenticationConfiguration authenticationConfiguration = new AuthenticationConfiguration();
-            builder.Configuration.Bind("Authentication", authenticationConfiguration);
-            builder.Services.AddSingleton(authenticationConfiguration);
-
             var connectionString = builder.Configuration.GetConnectionString(
                 "DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             builder.Services.AddControllers();
-
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-           .AddJwtBearer(options =>
-           {
-               options.TokenValidationParameters = new TokenValidationParameters
-               {
-                   ValidateIssuer = true,
-                   ValidateAudience = true,
-                   ValidateLifetime = true,
-                   ValidateIssuerSigningKey = true,
-                   ValidIssuer = authenticationConfiguration.Issuer,
-                   ValidAudience = authenticationConfiguration.Audience,
-                   IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationConfiguration.AccessTokenSecret))
-               };
-           });
+            builder.Services.AddAuthentication()
+            .AddGoogle(options =>
+            {
+                options.ClientId = "[Your Google Client ID]";
+                options.ClientSecret = "[Your Google Client Secret]";
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -44,12 +28,15 @@ namespace KnifeShop.API
             {
                 options.UseNpgsql(connectionString);
             });
+
             builder.Services.AddRepositories();
+            builder.Services.AddValidators();
+
             builder.Services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173");
+                    policy.WithOrigins("http://localhost:3000");
                     policy.AllowAnyHeader();
                     policy.AllowAnyMethod();
                 });

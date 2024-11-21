@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace KnifeShop.DB.DiContainer
 {
-    public static class DiExtensions
+    public static class DiRepositoryExtensions
     {
         public static void AddRepositories(this IServiceCollection services)
         {
