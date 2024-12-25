@@ -13,15 +13,16 @@ namespace KnifeShop.DB.Repositories
             _context = context;
         }
 
-        public async Task Create(string title, string category, string? description, string? image, double price, bool isOnSale)
+        public async Task Create(string title, string category, string? description, string? image, List<string>? images, double price, bool isOnSale)
         {
-            var knife = new Knife(title, category, description, image, price, isOnSale);
+            var dateNow = DateTime.UtcNow; // for postgree
+            var knife = new Knife(title, category, description, image, images, price, isOnSale, dateNow);
 
             await _context.Knifes.AddAsync(knife);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Knife?> Edit(long id, string title, string category, string description, string image, double price, bool isOnSale)
+        public async Task<Knife?> Edit(long id, string title, string category, string description, string image, List<string>? images, double price, bool isOnSale)
         {
             var knife = await _context.Knifes.FirstOrDefaultAsync(x => x.Id == id);
 
@@ -31,6 +32,7 @@ namespace KnifeShop.DB.Repositories
                 knife.Category = category;
                 knife.Description = description;
                 knife.Image = image;
+                knife.Images = images;
                 knife.Price = price;
                 knife.IsOnSale = isOnSale;
             }
@@ -58,6 +60,14 @@ namespace KnifeShop.DB.Repositories
                 : notesQuery.OrderBy(selectorKey);
 
             return await notesQuery.ToListAsync();
+        }
+
+        public async Task<List<Knife>> Get(int skip, int take)
+        {
+            return await _context.Knifes
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
         }
     }
 }

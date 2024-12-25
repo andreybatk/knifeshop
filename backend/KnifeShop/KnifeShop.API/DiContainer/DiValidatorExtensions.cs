@@ -7,6 +7,7 @@ namespace KnifeShop.API.DiContainer
     {
         public static void AddValidators(this IServiceCollection services)
         {
+            services.AddValidatorsFromAssemblyContaining<CreateKnifeRequestValidator>();
             services.AddValidatorsFromAssemblyContaining<EditKnifeRequestValidator>();
         }
     }

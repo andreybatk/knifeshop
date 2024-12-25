@@ -18,6 +18,8 @@ services:
         networks:
           - knifeshop-network
     knifeshop.api:
+        depends_on:
+          - postgres
         container_name: knifeshop.api
         image: knifeshop.api
         build:

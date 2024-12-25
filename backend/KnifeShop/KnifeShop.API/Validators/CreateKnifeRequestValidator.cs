@@ -3,22 +3,18 @@ using KnifeShop.API.Contracts;
 
 namespace KnifeShop.API.Validators
 {
-    public class EditKnifeRequestValidator : AbstractValidator<EditKnifeRequest>
+    public class CreateKnifeRequestValidator : AbstractValidator<CreateKnifeRequest>
     {
-        public EditKnifeRequestValidator()
+        public CreateKnifeRequestValidator()
         {
             RuleFor(x => x.Title)
-                .NotEmpty().WithMessage("Title cannot be empty.");
+                 .NotEmpty().WithMessage("Title cannot be empty.");
 
             RuleFor(x => x.Category)
                 .NotEmpty().WithMessage("Category cannot be empty.");
 
             RuleFor(x => x.Price)
                 .GreaterThan(0).WithMessage("Price must be greater than 0.");
-
-            RuleFor(x => x.Images)
-                .Must(images => images?.Count <= 5)
-                .WithMessage("Maximum 5 images.");
         }
     }
 }
