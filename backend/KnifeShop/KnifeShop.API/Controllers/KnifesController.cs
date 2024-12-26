@@ -21,10 +21,10 @@ namespace KnifeShop.API.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([FromForm] CreateKnifeRequest request, [FromForm] IFormFile? image, [FromForm] List<IFormFile>? images)
+        public async Task<IActionResult> Create([FromForm] CreateKnifeRequest request)
         {
-            var imagePath = await _fileService.UploadImage(image);
-            var imagesPath = await _fileService.UploadImages(images);
+            var imagePath = await _fileService.UploadImage(request.Image);
+            var imagesPath = await _fileService.UploadImages(request.Images);
 
             await _knifeRepository.Create(request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale);
             return Ok();
@@ -32,9 +32,12 @@ namespace KnifeShop.API.Controllers
 
         [HttpPost("{id}")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit([FromRoute] long id, [FromBody] EditKnifeRequest request)
+        public async Task<IActionResult> Edit([FromRoute] long id, [FromForm] EditKnifeRequest request)
         {
-            var result = await _knifeRepository.Edit(id, request.Title, request.Category, request.Description, request.Image, request.Images, request.Price, request.IsOnSale);
+            var imagePath = await _fileService.UploadImage(request.Image);
+            var imagesPath = await _fileService.UploadImages(request.Images);
+
+            var result = await _knifeRepository.Edit(id, request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale);
 
             if(result is null)
             {
@@ -48,6 +51,25 @@ namespace KnifeShop.API.Controllers
         public async Task<IActionResult> Get([FromQuery] GetKnifesRequest request)
         {
             return Ok(await _knifeRepository.Get(request.Search, request.SortItem, request.SortOrder));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get([FromRoute] long id)
+        {
+            return Ok(await _knifeRepository.Get(id));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] long id)
+        {
+            var result = await _knifeRepository.Delete(id);
+
+            if (result != 0)
+            {
+                return Ok("Нож успешно удален.");
+            }
+
+            return NotFound("Нож не найден.");
         }
 
         //[HttpGet]

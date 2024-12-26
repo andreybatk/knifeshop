@@ -1,9 +1,12 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { checkAdmin } from "../Auth/AuthUtils";
-import { API_URL_CREATE_KNIFE } from '../../config';
+import { API_URL_KNIFES } from '../../config';
 
 export default function AdminPanel() {
+    const navigate = useNavigate();
+    
     const [formData, setFormData] = useState({
         title: "",
         category: "",
@@ -55,11 +58,12 @@ export default function AdminPanel() {
         formData.secondaryImages.forEach((file) => data.append("images", file));
 
         try {
-            const response = await axios.post(API_URL_CREATE_KNIFE, data, {
+            const response = await axios.post(API_URL_KNIFES, data, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
             console.log("Knife created:", response.data);
             alert("Нож успешно создан!");
+            navigate("/admin");
         } catch (error) {
             console.error("Error creating knife:", error);
             alert("Ошибка при создании ножа!");

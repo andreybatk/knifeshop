@@ -22,7 +22,7 @@ namespace KnifeShop.DB.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Knife?> Edit(long id, string title, string category, string description, string image, List<string>? images, double price, bool isOnSale)
+        public async Task<Knife?> Edit(long id, string title, string category, string description, string? image, List<string>? images, double price, bool isOnSale)
         {
             var knife = await _context.Knifes.FirstOrDefaultAsync(x => x.Id == id);
 
@@ -46,12 +46,13 @@ namespace KnifeShop.DB.Repositories
         {
             var notesQuery = _context.Knifes
             .Where(n => string.IsNullOrWhiteSpace(search) ||
-                        n.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+                        n.Title.ToLower().Contains(search.ToLower()));
 
             Expression<Func<Knife, object>> selectorKey = sortItem?.ToLower() switch
             {
                 "date" => note => note.CreatedAt,
                 "title" => note => note.Title,
+                "price" => note => note.Price,
                 _ => note => note.Id
             };
 
@@ -60,6 +61,16 @@ namespace KnifeShop.DB.Repositories
                 : notesQuery.OrderBy(selectorKey);
 
             return await notesQuery.ToListAsync();
+        }
+
+        public async Task<Knife?> Get(long id)
+        {
+            return await _context.Knifes.FindAsync(id);
+        }
+
+        public async Task<int> Delete(long id)
+        {
+            return await _context.Knifes.Where(x => x.Id == id).ExecuteDeleteAsync();
         }
 
         public async Task<List<Knife>> Get(int skip, int take)
