@@ -42,11 +42,40 @@ namespace KnifeShop.DB.Repositories
             return knife;
         }
 
-        public async Task<List<Knife>> Get(string? search, string? sortItem, string? order)
+        public async Task<(List<Knife> Items, int TotalCount)> GetPaginated(string? search, string? sortItem, string? order, int page = 1, int pageSize = 10)
         {
             var notesQuery = _context.Knifes
-            .Where(n => string.IsNullOrWhiteSpace(search) ||
-                        n.Title.ToLower().Contains(search.ToLower()));
+                .Where(n => string.IsNullOrWhiteSpace(search) ||
+                            n.Title.ToLower().Contains(search.ToLower()));
+
+            Expression<Func<Knife, object>> selectorKey = sortItem?.ToLower() switch
+            {
+                "date" => note => note.CreatedAt,
+                "title" => note => note.Title,
+                "price" => note => note.Price,
+                _ => note => note.Id
+            };
+
+            notesQuery = order == "desc"
+                ? notesQuery.OrderByDescending(selectorKey)
+                : notesQuery.OrderBy(selectorKey);
+
+            int totalCount = await notesQuery.CountAsync();
+
+            var items = await notesQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
+
+        public async Task<List<Knife>> GetOnSale(string? search, string? sortItem, string? order)
+        {
+            var notesQuery = _context.Knifes
+                .Where(n => n.IsOnSale)
+                .Where(n => string.IsNullOrWhiteSpace(search) ||
+                            n.Title.ToLower().Contains(search.ToLower()));
 
             Expression<Func<Knife, object>> selectorKey = sortItem?.ToLower() switch
             {

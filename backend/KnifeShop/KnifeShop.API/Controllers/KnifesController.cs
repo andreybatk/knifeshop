@@ -47,10 +47,40 @@ namespace KnifeShop.API.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] GetKnifesRequest request)
+        //[HttpGet]
+        //public async Task<IActionResult> Get([FromQuery] GetKnifesRequest request)
+        //{
+        //    return Ok(await _knifeRepository.Get(request.Search, request.SortItem, request.SortOrder));
+        //}
+
+        [HttpGet("Paginated")]
+        public async Task<IActionResult> GetPaginated([FromQuery] GetKnifesPaginationRequest request)
         {
-            return Ok(await _knifeRepository.Get(request.Search, request.SortItem, request.SortOrder));
+            var result = await _knifeRepository.GetPaginated(
+                request.Search,
+                request.SortItem,
+                request.SortOrder,
+                request.Page,
+                request.PageSize
+            );
+
+            return Ok(new
+            {
+                items = result.Items,
+                totalCount = result.TotalCount // Общее количество товаров
+            });
+        }
+
+        [HttpGet("OnSale")]
+        public async Task<IActionResult> GetOnSale([FromQuery] GetKnifesRequest request)
+        {
+            var result = await _knifeRepository.GetOnSale(
+                request.Search,
+                request.SortItem,
+                request.SortOrder
+            );
+
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -60,6 +90,7 @@ namespace KnifeShop.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete([FromRoute] long id)
         {
             var result = await _knifeRepository.Delete(id);

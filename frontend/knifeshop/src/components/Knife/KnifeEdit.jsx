@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { API_URL_KNIFES, API } from "../../config";
 import { checkAdmin } from "../Auth/AuthUtils";
+import { Checkbox } from "@mui/material";
 
 export default function KnifeEdit() {
     const { id } = useParams();
@@ -179,9 +180,9 @@ export default function KnifeEdit() {
                     />
                 </div>
                 <div>
-                    <label>
+                    <label >
                         В наличии:
-                        <input
+                        <Checkbox 
                             type="checkbox"
                             name="isOnSale"
                             checked={formData.isOnSale}

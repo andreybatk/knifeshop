@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { checkAdmin } from "../Auth/AuthUtils";
 import { API_URL_KNIFES } from '../../config';
+import { Checkbox } from "@mui/material";
 
 export default function AdminPanel() {
     const navigate = useNavigate();
@@ -107,7 +108,7 @@ export default function AdminPanel() {
                     />
                     <label>
                         Есть в наличии:
-                        <input
+                        <Checkbox
                             type="checkbox"
                             name="isOnSale"
                             checked={formData.isOnSale}
@@ -118,7 +119,6 @@ export default function AdminPanel() {
                         type="file"
                         name="mainImage"
                         onChange={handleChange}
-                        required
                     />
                     <input
                         type="file"

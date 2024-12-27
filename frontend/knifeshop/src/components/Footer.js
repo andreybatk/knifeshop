@@ -1,9 +1,32 @@
+import React from "react";
+import BottomNavigation from "@mui/material/BottomNavigation";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import Telegram from "@mui/icons-material/Telegram";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import { AppBar, Toolbar, Box } from '@mui/material';
+
 export default function Footer() {
+    const handleTelegramClick = () => {
+        window.location.href = "https://t.me";
+    };
+
     return (
-        <footer className="page-footer grey darken-4">
-            <div className="container">
-                © {new Date().getFullYear()} All rights reserved
-            </div>
-        </footer>
+        <AppBar position="static">
+            <Toolbar>
+                <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                    <BottomNavigation style={{ backgroundColor: "transparent" }}>
+                        <BottomNavigationAction 
+                            label="Telegram" 
+                            icon={<Telegram style={{ color: "white" }} />} 
+                            onClick={handleTelegramClick} // Переход по ссылке
+                        />
+                        <BottomNavigationAction 
+                            label="Instagram" 
+                            icon={<InstagramIcon style={{ color: "white" }} />} 
+                        />
+                    </BottomNavigation>
+                </Box>
+            </Toolbar>
+        </AppBar>
     );
 }

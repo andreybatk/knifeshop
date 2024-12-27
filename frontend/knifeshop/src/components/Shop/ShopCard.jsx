@@ -1,7 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { API } from '../../config';
-import { checkAdmin } from "../Auth/AuthUtils";
-import { useState, useEffect } from "react";
 
 export default function ShopCard(props) {
     const {
@@ -20,23 +18,7 @@ export default function ShopCard(props) {
         navigate(`/knifes/${id}`);
     };
 
-    const handleEditClick = () => {
-        navigate(`/knifes/${id}/edit`);
-    };
-
     const defaultImage = "/default-knife.jpg";
-
-    // Предположим, что флаг администратора приходит через пропсы или из контекста
-    const [isAdmin, setIsAdmin] = useState(false);
-    
-        useEffect(() => {
-            const fetchRole = async () => {
-                const isAdmin = await checkAdmin();
-                setIsAdmin(isAdmin);
-            };
-    
-            fetchRole();
-        }, []);
 
     return (
         <div id={`knife-${id}`} className="card">
@@ -51,8 +33,7 @@ export default function ShopCard(props) {
             <div className="card-content">
                 <span
                     className="card-title activator grey-text text-darken-4"
-                    onClick={isAdmin ? handleEditClick : undefined}
-                    style={{ cursor: isAdmin ? 'pointer' : 'default' }}
+                    onClick={handleDetailsClick}
                 >
                     {title}
                     <i className="material-icons right">more_vert</i>
