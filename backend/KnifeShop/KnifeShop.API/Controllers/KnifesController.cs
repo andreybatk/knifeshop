@@ -26,8 +26,8 @@ namespace KnifeShop.API.Controllers
             var imagePath = await _fileService.UploadImage(request.Image);
             var imagesPath = await _fileService.UploadImages(request.Images);
 
-            await _knifeRepository.Create(request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale);
-            return Ok();
+            var id = await _knifeRepository.Create(request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale);
+            return Ok(id);
         }
 
         [HttpPost("{id}")]

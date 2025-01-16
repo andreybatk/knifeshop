@@ -27,23 +27,28 @@ namespace KnifeShop.BL.Services
             return null;
         }
 
-        public async Task<List<string>> UploadImages(List<IFormFile>? imageFiles)
+        public async Task<List<string>?> UploadImages(List<IFormFile>? imageFiles)
         {
-            var uploadedPaths = new List<string>();
-
-            if (imageFiles != null)
+            if(imageFiles != null && imageFiles.Count > 0)
             {
-                foreach (var file in imageFiles)
+                var uploadedPaths = new List<string>();
+
+                if (imageFiles != null)
                 {
-                    var path = await UploadImage(file);
-                    if (path != null)
+                    foreach (var file in imageFiles)
                     {
-                        uploadedPaths.Add(path);
+                        var path = await UploadImage(file);
+                        if (path != null)
+                        {
+                            uploadedPaths.Add(path);
+                        }
                     }
                 }
+
+                return uploadedPaths;
             }
 
-            return uploadedPaths;
+            return null;
         }
     }
 }

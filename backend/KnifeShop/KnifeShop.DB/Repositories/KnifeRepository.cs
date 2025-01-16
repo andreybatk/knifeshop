@@ -13,13 +13,15 @@ namespace KnifeShop.DB.Repositories
             _context = context;
         }
 
-        public async Task Create(string title, string category, string? description, string? image, List<string>? images, double price, bool isOnSale)
+        public async Task<long> Create(string title, string category, string? description, string? image, List<string>? images, double price, bool isOnSale)
         {
             var dateNow = DateTime.UtcNow; // for postgree
             var knife = new Knife(title, category, description, image, images, price, isOnSale, dateNow);
 
             await _context.Knifes.AddAsync(knife);
             await _context.SaveChangesAsync();
+
+            return knife.Id;
         }
 
         public async Task<Knife?> Edit(long id, string title, string category, string description, string? image, List<string>? images, double price, bool isOnSale)
@@ -31,10 +33,11 @@ namespace KnifeShop.DB.Repositories
                 knife.Title = title;
                 knife.Category = category;
                 knife.Description = description;
-                knife.Image = image;
-                knife.Images = images;
                 knife.Price = price;
                 knife.IsOnSale = isOnSale;
+
+                if (image is not null) { knife.Image = image; }
+                if (images is not null) { knife.Images = images; }
             }
 
             await _context.SaveChangesAsync();
