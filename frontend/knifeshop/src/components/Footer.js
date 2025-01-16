@@ -4,10 +4,11 @@ import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import Telegram from "@mui/icons-material/Telegram";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { AppBar, Toolbar, Box } from '@mui/material';
+import { TELEGRAM_BUY } from '../config';
 
 export default function Footer() {
     const handleTelegramClick = () => {
-        window.location.href = "https://t.me";
+        window.location.href = TELEGRAM_BUY;
     };
 
     return (

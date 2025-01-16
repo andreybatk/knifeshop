@@ -1,13 +1,12 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { API_URL_KNIFES} from "../../config";
 import { checkAdmin } from "../Auth/AuthUtils";
 import { Checkbox } from "@mui/material";
 import { Box, Button, Typography, Paper } from "@mui/material";
 
 export default function KnifeEdit() {
-    const { id } = useParams();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -15,39 +14,10 @@ export default function KnifeEdit() {
         category: "",
         description: "",
         price: "",
-        isOnSale: false,
+        isOnSale: true,
         image: null,
         images: [],
     });
-
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchKnife = async () => {
-            try {
-                const response = await axios.get(`${API_URL_KNIFES}/${id}`);
-                const knife = response.data;
-                setFormData({
-                    title: knife.title,
-                    category: knife.category,
-                    description: knife.description,
-                    price: knife.price,
-                    isOnSale: knife.isOnSale,
-                    image: null,
-                    images: [],
-                });
-
-                setLoading(false);
-            } catch (err) {
-                console.error("Ошибка загрузки данных ножа:", err);
-                setError("Не удалось загрузить данные ножа");
-                setLoading(false);
-            }
-        };
-
-        fetchKnife();
-    }, [id]);
 
     const [isAdmin, setIsAdmin] = useState(false);
 
@@ -63,7 +33,7 @@ export default function KnifeEdit() {
     if (!isAdmin) {
         return <p>Доступ запрещен: только для администраторов.</p>;
     }
-
+    
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData((prev) => ({
@@ -95,20 +65,6 @@ export default function KnifeEdit() {
         }));
     };
 
-    const handleDelete = async () => {
-        const confirmDelete = window.confirm("Вы уверены, что хотите удалить этот нож?");
-        if (!confirmDelete) return;
-
-        try {
-            await axios.delete(`${API_URL_KNIFES}/${id}`);
-            alert("Нож успешно удален!");
-            navigate("/"); // Перенаправляем на страницу со списком ножей
-        } catch (err) {
-            console.error("Ошибка при удалении ножа:", err);
-            alert("Не удалось удалить нож.");
-        }
-    };
-
     const handleBoxClick = () => {
         document.getElementById('fileInput').click();
       };
@@ -126,25 +82,23 @@ export default function KnifeEdit() {
         formData.images.forEach((image) => data.append("Images", image));
 
         try {
-            await axios.post(`${API_URL_KNIFES}/${id}`, data, {
+            const response = await axios.post(API_URL_KNIFES, data, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            alert("Нож успешно обновлен!");
-            navigate(`/knifes/${id}`);
+            // Извлечение ID из ответа
+            const knifeId = response.data; // предполагаем, что сервер возвращает только ID
+            alert("Нож успешно добавлен!");
+            // Перенаправление на страницу с данным ножом
+            navigate(`/knifes/${knifeId}`); // здесь knifeId - это ID нового ножа
         } catch (err) {
-            console.error("Ошибка при редактировании ножа:", err);
-            alert("Не удалось обновить нож.");
-          }
+            console.error("Ошибка при добавлении ножа:", err);
+              alert("Не удалось добавить нож.");
+            }
     };
-
-    if (loading) return <p>Загрузка...</p>;
-    if (error) return <p>{error}</p>;
-
-    const defaultImage = "/default-knife.jpg";
 
     return (
         <main className="container">
-            <h1>Редактирование ножа</h1>
+            <h1>Создание ножа</h1>
             <form onSubmit={handleSubmit}>
                 <Box mb={3}>
                     <label>Название:</label>
@@ -245,16 +199,7 @@ export default function KnifeEdit() {
 
                 <Box mb={3}>
                     <Button type="submit" variant="contained" color="primary">
-                        Сохранить изменения
-                    </Button>
-                    <Button
-                        type="button"
-                        variant="outlined"
-                        color="error"
-                        onClick={handleDelete}
-                        sx={{ ml: 2 }}
-                    >
-                        Удалить нож
+                        Создать нож
                     </Button>
                 </Box>
             </form>

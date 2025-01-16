@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { API } from '../../config';
+import { API, TELEGRAM_BUY } from '../../config';
+import { Button} from "@mui/material";
 
 export default function ShopCard(props) {
     const {
         id,
         title,
         category,
-        description,
         image,
         price,
         isOnSale,
@@ -16,6 +16,10 @@ export default function ShopCard(props) {
 
     const handleDetailsClick = () => {
         navigate(`/knifes/${id}`);
+    };
+
+    const handleBuyClick = () => {
+        window.location.href = TELEGRAM_BUY;
     };
 
     const defaultImage = "/default-knife.jpg";
@@ -41,11 +45,19 @@ export default function ShopCard(props) {
                 <p>Категория: {category}</p>
                 <p>Цена: {price} руб. {!isOnSale && <span className="sale-tag">(Нет в наличии)</span>}</p>
             </div>
-            <div className="card-action">
-                <button className="btn-small blue darken-5">Купить</button>
-                <button className="btn-small right blue darken-2" onClick={handleDetailsClick}>
+            <div className="card-action" style={{ display: 'flex', alignItems: 'center' }}>
+                <Button type="submit" variant="contained" color="primary" onClick={handleBuyClick} disabled={!isOnSale}>
+                    Купить
+                </Button>
+                <Button
+                    type="button"
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleDetailsClick}
+                    sx={{ ml: 'auto' }}
+                >
                     Подробнее
-                </button>
+                </Button>
             </div>
         </div>
     );

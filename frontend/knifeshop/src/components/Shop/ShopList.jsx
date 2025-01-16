@@ -103,8 +103,14 @@ export default function ShopList() {
               page={currentPage}
               onChange={handlePageChange}
               variant="outlined"
-              sx={{ margin: '20px auto', display: 'flex', justifyContent: 'center' }}
-              
+              sx={{
+                margin: '20px auto',
+                display: 'flex',
+                justifyContent: 'center',
+                '& .MuiPagination-root': {
+                    backgroundColor: 'transparent', // Уберите красный цвет
+                },
+            }}
             />
             </>
           ) : (

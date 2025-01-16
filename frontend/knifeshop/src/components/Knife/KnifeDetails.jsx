@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { API_URL_KNIFES, API } from "../../config";
-import { Accordion, AccordionSummary, AccordionDetails, Card, CardMedia, CardContent, Typography, Grid2, Box, ImageList, ImageListItem, Chip } from "@mui/material";
+import { API_URL_KNIFES, API, TELEGRAM_BUY } from "../../config";
+import { Accordion, AccordionSummary, AccordionDetails, Button, Card, CardActions, CardMedia, CardContent, Typography, Grid2, Box, ImageList, ImageListItem, Chip } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from "react-router-dom";
 import { checkAdmin } from "../Auth/AuthUtils";
@@ -16,6 +16,10 @@ export default function KnifeDetails() {
     const navigate = useNavigate();
     const handleEditClick = () => {
         navigate(`/knifes/${id}/edit`);
+    };
+
+    const handleBuyClick = () => {
+        window.location.href = TELEGRAM_BUY;
     };
 
     const [isAdmin, setIsAdmin] = useState(false);
@@ -87,14 +91,17 @@ export default function KnifeDetails() {
                             <Typography variant="body2" color="text.secondary">
                                 Добавлено: {new Date(knife.createdAt).toLocaleDateString()}
                             </Typography>
-                            {isAdmin && (
-                                <button 
-                                    className="btn-small green darken-2" 
-                                    onClick={handleEditClick}
-                                >
+                            <CardActions sx={{ padding: 0, mt: 2 }}> 
+                                <Button type="submit" variant="contained" color = "secondary" onClick={handleBuyClick} disabled={!knife.isOnSale}>
+                                    Купить
+                                </Button>
+
+                                {isAdmin && (
+                                    <Button type="submit" variant="outlined" color="success" onClick={handleEditClick}>
                                     Редактировать
-                                </button>
-                            )}
+                                    </Button>
+                                )}
+                            </CardActions> 
                         </CardContent>
                     </Grid2>
                 </Grid2>
