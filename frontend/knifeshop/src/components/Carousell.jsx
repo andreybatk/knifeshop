@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Slider from 'react-slick'; // Импортируем Slider из react-slick
-import { API, API_URL_KNIFES_ON_SALE } from './config';
+import { API, API_URL_KNIFES_ON_SALE } from '../config';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Импортируем useNavigate
+import Preloader from './Preloader';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -40,7 +41,7 @@ function Carousell(props) {
     }, []);
 
     if (loading) {
-        return <p>Loading...</p>;
+        return <Preloader />;
     }
 
     const settings = {

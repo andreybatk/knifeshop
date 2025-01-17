@@ -1,4 +1,4 @@
-import Carousell from "../Carousell";
+import Carousell from "./Carousell";
 import AboutUs from "./AboutUs";
 import CatalogCallToAction from "./CatalogCallToAction";
 import { Box, Grid2, Typography } from '@mui/material';
