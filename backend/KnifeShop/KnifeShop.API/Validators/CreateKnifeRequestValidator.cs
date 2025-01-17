@@ -15,6 +15,11 @@ namespace KnifeShop.API.Validators
 
             RuleFor(x => x.Price)
                 .GreaterThan(0).WithMessage("Price must be greater than 0.");
+
+            RuleFor(x => x.Images)
+                .Must(images => images?.Count <= 5)
+                .WithMessage("Maximum 5 images.")
+                .When(x => x.Images != null && x.Images.Count > 0);
         }
     }
 }

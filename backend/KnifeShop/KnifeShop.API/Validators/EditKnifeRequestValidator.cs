@@ -18,7 +18,8 @@ namespace KnifeShop.API.Validators
 
             RuleFor(x => x.Images)
                 .Must(images => images?.Count <= 5)
-                .WithMessage("Maximum 5 images.");
+                .WithMessage("Maximum 5 images.")
+                .When(x => x.Images != null && x.Images.Count > 0);
         }
     }
 }

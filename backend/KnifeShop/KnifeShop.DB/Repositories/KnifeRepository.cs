@@ -13,10 +13,15 @@ namespace KnifeShop.DB.Repositories
             _context = context;
         }
 
-        public async Task<long> Create(string title, string category, string? description, string? image, List<string>? images, double price, bool isOnSale)
+        public async Task<long> Create(string title, string category, string? description, string? image, List<string>? images, double price, bool isOnSale,
+            double? overallLength, double? bladeLength, double? buttThickness, double? weight, string? handleMaterial, string? country, string? manufacturer, string? steelGrade)
         {
-            var dateNow = DateTime.UtcNow; // for postgree
+            var knifeInfo = new KnifeInfo(overallLength, bladeLength, buttThickness, weight, handleMaterial, country, manufacturer, steelGrade);
+            await _context.KnifesInfo.AddAsync(knifeInfo);
+
+            var dateNow = DateTime.UtcNow; // for Postgres
             var knife = new Knife(title, category, description, image, images, price, isOnSale, dateNow);
+            knife.KnifesInfo = knifeInfo;
 
             await _context.Knifes.AddAsync(knife);
             await _context.SaveChangesAsync();
@@ -24,9 +29,12 @@ namespace KnifeShop.DB.Repositories
             return knife.Id;
         }
 
-        public async Task<Knife?> Edit(long id, string title, string category, string description, string? image, List<string>? images, double price, bool isOnSale)
+        public async Task<Knife?> Edit(long id, string title, string category, string description, string? image, List<string>? images, double price, bool isOnSale,
+            double? overallLength, double? bladeLength, double? buttThickness, double? weight, string? handleMaterial, string? country, string? manufacturer, string? steelGrade)
         {
-            var knife = await _context.Knifes.FirstOrDefaultAsync(x => x.Id == id);
+            var knife = await _context.Knifes
+                .Include(k => k.KnifesInfo)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if(knife is not null)
             {
@@ -38,9 +46,18 @@ namespace KnifeShop.DB.Repositories
 
                 if (image is not null) { knife.Image = image; }
                 if (images is not null) { knife.Images = images; }
-            }
 
-            await _context.SaveChangesAsync();
+                knife.KnifesInfo.OverallLength = overallLength;
+                knife.KnifesInfo.BladeLength = bladeLength;
+                knife.KnifesInfo.ButtThickness = buttThickness;
+                knife.KnifesInfo.Weight = weight;
+                knife.KnifesInfo.HandleMaterial = handleMaterial;
+                knife.KnifesInfo.Country = country;
+                knife.KnifesInfo.Manufacturer = manufacturer;
+                knife.KnifesInfo.SteelGrade = steelGrade;
+
+                await _context.SaveChangesAsync();
+            }
 
             return knife;
         }
@@ -48,6 +65,7 @@ namespace KnifeShop.DB.Repositories
         public async Task<(List<Knife> Items, int TotalCount)> GetPaginated(string? search, string? sortItem, string? order, int page = 1, int pageSize = 10)
         {
             var notesQuery = _context.Knifes
+                .Include(k => k.KnifesInfo)
                 .Where(n => string.IsNullOrWhiteSpace(search) ||
                             n.Title.ToLower().Contains(search.ToLower()));
 
@@ -76,6 +94,7 @@ namespace KnifeShop.DB.Repositories
         public async Task<List<Knife>> GetOnSale(string? search, string? sortItem, string? order)
         {
             var notesQuery = _context.Knifes
+                .Include(k => k.KnifesInfo)
                 .Where(n => n.IsOnSale)
                 .Where(n => string.IsNullOrWhiteSpace(search) ||
                             n.Title.ToLower().Contains(search.ToLower()));
@@ -97,20 +116,23 @@ namespace KnifeShop.DB.Repositories
 
         public async Task<Knife?> Get(long id)
         {
-            return await _context.Knifes.FindAsync(id);
+            return await _context.Knifes
+                .Include(k => k.KnifesInfo)
+                .FirstOrDefaultAsync(k => k.Id == id);
         }
 
         public async Task<int> Delete(long id)
         {
-            return await _context.Knifes.Where(x => x.Id == id).ExecuteDeleteAsync();
-        }
+            var knife = await _context.Knifes
+                .Include(k => k.KnifesInfo) 
+                .FirstOrDefaultAsync(k => k.Id == id);
 
-        public async Task<List<Knife>> Get(int skip, int take)
-        {
-            return await _context.Knifes
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync();
+            if (knife is null)
+                return 0; 
+
+            _context.Knifes.Remove(knife);
+            await _context.SaveChangesAsync();
+            return 1;
         }
     }
 }

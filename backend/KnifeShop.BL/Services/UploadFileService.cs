@@ -4,13 +4,14 @@ namespace KnifeShop.BL.Services
 {
     public class UploadFileService : IUploadFileService
     {
+        private const string URL_KNIVES = "/Uploads/Knives/";
+
         public async Task<string?> UploadImage(IFormFile? imageFile)
         {
             if (imageFile != null && imageFile.Length > 0)
             {
-                // Определите путь для сохранения файла
                 var uploadPath = Path.Combine("Uploads", "Knives");
-                Directory.CreateDirectory(uploadPath); // Создать директорию, если она не существует
+                Directory.CreateDirectory(uploadPath);
 
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
                 var filePath = Path.Combine(uploadPath, fileName);
@@ -20,8 +21,7 @@ namespace KnifeShop.BL.Services
                     await imageFile.CopyToAsync(stream);
                 }
 
-                // Установите URL файла в модель
-                return $"/Uploads/Knives/{fileName}";
+                return $"{URL_KNIVES}{fileName}";
             }
 
             return null;

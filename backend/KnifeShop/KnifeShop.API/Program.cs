@@ -1,7 +1,7 @@
 using KnifeShop.API.DiContainer;
-using KnifeShop.DB;
 using KnifeShop.DB.DiContainer;
 using KnifeShop.BL.DiContainer;
+using KnifeShop.DB;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
@@ -83,10 +83,6 @@ namespace KnifeShop.API
                 app.UseSwaggerUI();
             }
 
-            // Настройка статических файлов
-            app.UseStaticFiles(); // Для файлов в wwwroot
-
-            // Добавление пути для отдачи файлов из папки "Uploads"
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),

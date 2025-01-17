@@ -1,4 +1,6 @@
-﻿using KnifeShop.API.Contracts;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using KnifeShop.API.Contracts;
 using KnifeShop.BL.Services;
 using KnifeShop.DB.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -13,45 +15,63 @@ namespace KnifeShop.API.Controllers
         private readonly IKnifeRepository _knifeRepository;
         private readonly IUploadFileService _fileService;
 
-        public KnifesController(IKnifeRepository knifeRepository, IUploadFileService fileService)
+        private IValidator<CreateKnifeRequest> _createKnifeValidator;
+        private IValidator<EditKnifeRequest> _editKnifeValidator;
+
+        public KnifesController(IKnifeRepository knifeRepository, IUploadFileService fileService, IValidator<CreateKnifeRequest> createKnifeValidator, IValidator<EditKnifeRequest> editKnifeValidator)
         {
             _knifeRepository = knifeRepository;
             _fileService = fileService;
+            _createKnifeValidator = createKnifeValidator;
+            _editKnifeValidator = editKnifeValidator;
         }
 
         [HttpPost]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromForm] CreateKnifeRequest request)
         {
-            var imagePath = await _fileService.UploadImage(request.Image);
-            var imagesPath = await _fileService.UploadImages(request.Images);
+            var validationResult = await _createKnifeValidator.ValidateAsync(request);
 
-            var id = await _knifeRepository.Create(request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale);
-            return Ok(id);
+            if(validationResult.IsValid)
+            {
+                var imagePath = await _fileService.UploadImage(request.Image);
+                var imagesPath = await _fileService.UploadImages(request.Images);
+
+                var id = await _knifeRepository.Create(request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale,
+                    request.OverallLength, request.BladeLength, request.ButtThickness, request.Weight, request.HandleMaterial, request.Country, request.Manufacturer, request.SteelGrade);
+
+                return Ok(id);
+            }
+
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
         }
 
-        [HttpPost("{id}")]
+        [HttpPut("{id}")]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit([FromRoute] long id, [FromForm] EditKnifeRequest request)
         {
-            var imagePath = await _fileService.UploadImage(request.Image);
-            var imagesPath = await _fileService.UploadImages(request.Images);
+            var validationResult = await _editKnifeValidator.ValidateAsync(request);
 
-            var result = await _knifeRepository.Edit(id, request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale);
-
-            if(result is null)
+            if (validationResult.IsValid)
             {
-                return BadRequest($"Edit knife with Id {id} is fault.");
+                var imagePath = await _fileService.UploadImage(request.Image);
+                var imagesPath = await _fileService.UploadImages(request.Images);
+
+                var result = await _knifeRepository.Edit(id, request.Title, request.Category, request.Description, imagePath, imagesPath, request.Price, request.IsOnSale,
+                     request.OverallLength, request.BladeLength, request.ButtThickness, request.Weight, request.HandleMaterial, request.Country, request.Manufacturer, request.SteelGrade);
+
+                if(result is null)
+                {
+                    return BadRequest($"Edit knife with Id {id} is fault.");
+                }
+
+                return Ok();
             }
 
-            return Ok();
+            validationResult.AddToModelState(ModelState);
+            return BadRequest(ModelState);
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> Get([FromQuery] GetKnifesRequest request)
-        //{
-        //    return Ok(await _knifeRepository.Get(request.Search, request.SortItem, request.SortOrder));
-        //}
 
         [HttpGet("Paginated")]
         public async Task<IActionResult> GetPaginated([FromQuery] GetKnifesPaginationRequest request)
@@ -86,7 +106,14 @@ namespace KnifeShop.API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] long id)
         {
-            return Ok(await _knifeRepository.Get(id));
+            var result = await _knifeRepository.Get(id);
+
+            if(result is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
@@ -97,16 +124,10 @@ namespace KnifeShop.API.Controllers
 
             if (result != 0)
             {
-                return Ok("Нож успешно удален.");
+                return Ok(result);
             }
 
-            return NotFound("Нож не найден.");
+            return NotFound();
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> Get(int skip, int take)
-        //{
-        //    return Ok();
-        //}
     }
 }

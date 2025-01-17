@@ -1,4 +1,6 @@
-﻿namespace KnifeShop.API.Contracts
+﻿using KnifeShop.DB.Models;
+
+namespace KnifeShop.API.Contracts
 {
     public class CreateKnifeRequest
     {
@@ -9,5 +11,13 @@
         public bool IsOnSale { get; set; }
         public IFormFile? Image { get; set; }
         public List<IFormFile>? Images { get; set; }
+        public double? OverallLength { get; set; }
+        public double? BladeLength { get; set; }
+        public double? ButtThickness { get; set; }
+        public double? Weight { get; set; }
+        public string? HandleMaterial { get; set; }
+        public string? Country { get; set; }
+        public string? Manufacturer { get; set; }
+        public string? SteelGrade { get; set; }
     }
 }
