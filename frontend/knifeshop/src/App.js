@@ -10,6 +10,8 @@ import KnifeDetails from "./components/Knife/KnifeDetails";
 import KnifeEdit from "./components/Knife/KnifeEdit";
 import ShopList from "./components/Shop/ShopList";
 import NotFound from "./components/NotFound";
+import Auth from "./components/Auth/Auth";
+import AdminPanel from "./components/Admin/AdminPanel";
 
 const theme = createTheme({
   palette: {
@@ -44,7 +46,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Content />} />
           <Route path="/catalog" element={<ShopList />} />
-          <Route path="/admin" element={<CreateKnife />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/knifes/:id" element={<KnifeDetails />} />
           <Route path="/knifes/:id/edit" element={<KnifeEdit />} />
           <Route path="*" element={<NotFound />} />

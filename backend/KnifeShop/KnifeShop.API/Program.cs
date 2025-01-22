@@ -30,8 +30,8 @@ namespace KnifeShop.API
             .AddCookie()
             .AddGoogle(options =>
             {
-                options.ClientId = "your-client-id";
-                options.ClientSecret = "your-client-secret";
+                options.ClientId = builder.Configuration.GetSection("Google:ClientId").Get<string>() ?? throw new InvalidOperationException("Google 'ClientId' not found.");
+                options.ClientSecret = builder.Configuration.GetSection("Google:ClientSecret").Get<string>() ?? throw new InvalidOperationException("Google 'ClientSecret' not found.");
 
                 options.Events.OnCreatingTicket = context =>
                 {
@@ -90,9 +90,9 @@ namespace KnifeShop.API
             });
 
             app.UseHttpsRedirection();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors();
             app.MapControllers();
 
             app.Run();

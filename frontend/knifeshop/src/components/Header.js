@@ -1,22 +1,25 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { checkAdmin } from "./Auth/AuthUtils";
+import { checkAdmin, getCurrentUser } from "./Auth/AuthUtils";
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 
 export default function Header() {
     const [isAdmin, setIsAdmin] = useState(false);
+    const [userEmail, setUser] = useState(null);
 
     useEffect(() => {
-        const fetchRole = async () => {
-            const isAdmin = await checkAdmin();
-            setIsAdmin(isAdmin);
+        const fetchData = async () => {
+          const adminStatus = await checkAdmin();
+          setIsAdmin(adminStatus);
+    
+          const currentUser = await getCurrentUser();
+          setUser(currentUser);
         };
-
-        fetchRole();
-    }, []);
+    
+        fetchData();
+      }, []);
 
     return (
-        
         <AppBar position="static">
             <Toolbar>
                 {/* Используем Box для текста и иконки с флекс-выравниванием */}
@@ -34,6 +37,13 @@ export default function Header() {
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button component={Link} to="/catalog" color="inherit">Каталог</Button>
                     {isAdmin && <Button component={Link} to="/admin" color="inherit">Админ панель</Button>}
+                    {userEmail  ? (
+                        <Button color="inherit">{ userEmail }</Button>
+                        ) : (
+                        <Button component={Link} to="/auth" color="inherit">
+                            Вход
+                        </Button>
+                    )}
                 </Box>
             </Toolbar>
         </AppBar>
